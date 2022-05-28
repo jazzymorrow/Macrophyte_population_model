@@ -37,12 +37,13 @@ library(patchwork)
 ## Code
 
 ```{r}
-##Simulation function
+############## Simulation function ######################
 #Inputs:
 #inipop = dataframe of initial macrophyte population
 #initurb = number describing the starting turbidity levels 
 #p = list of parameters
 #returns: macrophyte number, turbidity level and trait (z) mean and sd
+
 macrophyte_growth <- function(inipop, initurb, tmax, p){
   ###set up data###
   Turb <- rep(0, tmax) #store turbidity over simulation 
@@ -122,8 +123,8 @@ macrophyte_growth <- function(inipop, initurb, tmax, p){
 ######## Running function ###########
 #this function runs the macrophyte population model numerous times 
 #it allows parameters and initial values to be specified 
-# it requires number of simulations
-#returns 4 matrices corresponding to 
+# it requires number of simulations (n_sims)
+#returns 4 matrices corresponding to macrophyte population, turbidity level, mean trait value and trait standard deviation
 runMacrophyte <- function(n_sims, tmax = 100, rm = 0.1, rt = 0.1,
                           hm = 0.2, T0 = 3, zmin = 2, zmax = 2,
                           K = 50, mu = 0.05, sigma = 0.001, n0 = 10,initurb = 0.5){
@@ -474,3 +475,4 @@ ggplot() + geom_line(data = z_summary, aes(x = Time, y = mean_z), col = "blue") 
 
 
 ## Conclusion 
+Trait variation and evolution increase the resilience of macrophyte population. Consequently, trait variation is extremely important for maintaining shallow lake ecosystems. Furthermore, initial turbidity has no effect on macrophyte population trajectories. This information is important for restoration efforts - reintroduction of macrophytes should be possible at various turbidity levels. 
