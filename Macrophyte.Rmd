@@ -11,21 +11,14 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction
 
-The abundance of aquatic vegetation (macrophytes) in shallow lakes play a key role in reducing turbidity and providing a food source for inhabitants. However, disturbing or removing macrophytes can cause rapid and irreversible changes to conditions (Scheffer, 2004). Such observations have led researchers to conclude that shallow lakes commonly have two stable states; clear and turbid (scheffer, 2004).The state of the ecosystem will change after a critical value, or tipping point, is reached.
+The abundance of aquatic vegetation (macrophytes) in shallow lakes play a key role in reducing turbidity and providing a food source for inhabitants. However, disturbing or removing macrophytes can cause rapid and irreversible changes to conditions (Scheffer, 2004). Such observations have led researchers to conclude that shallow lakes commonly have two stable states; clear and turbid (Scheffer, 2004).The state of the ecosystem will change after a critical value, or tipping point, is reached.
 
-Previous research found macrophyte population size to primarily determine whether or not a state shift occurred  (Scheffer, 1993). Dakos et al (2019) further argued that trait variation and evolution are important for understanding tipping point dynamics. Dakos et al (2019) found that phenotypic variation can make macrophytes more resilient to collapse. However, this model was studied analytically, with a fixed trait score for the entire population which remained constant through time. This is a limited approach, since individuals who are fitter should be more likely to survive and reproduce. 
-
-
+Previous research found macrophyte population size to primarily determine whether or not a state shift occurred (Scheffer, 1993). Dakos et al (2019) further argued that trait variation and evolution are important for understanding tipping point dynamics. Dakos et al (2019) found that phenotypic variation can make macrophytes more resilient to collapse. However, this model was studied analytically, with a fixed trait score for the entire population which remained constant through time. This is a limited approach, since individuals who are fitter should be more likely to survive and reproduce.
 
 ## Methods
 
-I created an individual-based stochastic model describing macrophyte population dynamics in response to turbidity. The model is adapted from an ordinary differential equation system described by Dakos et al (2019). The model tracks a population of macrophyte individuals and their trait value (z) through time. The simulation began with an initial population ($n_0$) of macrophyte individuals, each with a trait value (z). Initial trait values were generated with a beta distribution (shape = $z_1$, scale =$z_2$). Each time period, an individual has a fixed probability of dying ($\mu$). Given an individual does not die, they have a probability of reproducing:
-$$ P(reproducing)=r_MM\left(1-\frac{M}{K}\left(\frac{h_T^4+T^4}{h_t^4}\right)\right) $$
-This probability was used to closely match the analytic model, since highest reproduction probability would occur when growth rate was highest. Reproduction depended on a number of fixed parameters (Table 1), the number of macrophyte individuals in the previous time period (M), sensitivity to turbidity ($h_T$) and turbidity in the current time period (T). Turbidity was updated each time using a difference equation:
-$$T_{t+1}=T_t+r_TT_t\left(1-\frac{T_t}{T_0\frac{h_M}{h_M+\frac{M}{K}}}\right)$$   
-Sensitivity to turbidity was determined by individual trait value ($h_T$) in a relationship described by Dakos et al (2019):
-$$h_T=e^{cz} $$
-With parameters also fixed (table 1). Consequently, higher turbidity and lower trait values decreased an individuals chance of reproducing. It was assumed that all reproduction was asexual, and offspring received the same trait value as their parent with some random genetic mutation ($\sigma$).
+I created an individual-based stochastic model describing macrophyte population dynamics in response to turbidity. The model is adapted from an ordinary differential equation system described by Dakos et al (2019). The model tracks a population of macrophyte individuals and their trait value (z) through time. The simulation began with an initial population ($n_0$) of macrophyte individuals, each with a trait value (z). Initial trait values were generated with a beta distribution (shape = $z_1$, scale =$z_2$). Each time period, an individual has a fixed probability of dying ($\mu$). Given an individual does not die, they have a probability of reproducing: $$ P(reproducing)=r_MM\left(1-\frac{M}{K}\left(\frac{h_T^4+T^4}{h_t^4}\right)\right) $$ This probability was used to closely match the analytic model, since highest reproduction probability would occur when growth rate was highest. Reproduction depended on a number of fixed parameters (Table 1), the number of macrophyte individuals in the previous time period (M), sensitivity to turbidity ($h_T$) and turbidity in the current time period (T). Turbidity was updated each time using a difference equation: $$T_{t+1}=T_t+r_TT_t\left(1-\frac{T_t}{T_0\frac{h_M}{h_M+\frac{M}{K}}}\right)$$\
+Sensitivity to turbidity was determined by individual trait value ($h_T$) in a relationship described by Dakos et al (2019): $$h_T=e^{cz} $$ With parameters also fixed (table 1). Consequently, higher turbidity and lower trait values decreased an individuals chance of reproducing. It was assumed that all reproduction was asexual, and offspring received the same trait value as their parent with some random genetic mutation ($\sigma$).
 
 | Parameter                                 | Value/Range         |
 |-------------------------------------------|---------------------|
@@ -41,7 +34,7 @@ With parameters also fixed (table 1). Consequently, higher turbidity and lower t
 
 : Parameter values/ranges used in the model.\*values selected by Dakos et al (2019)
 
-All analysis was conducted in RStudio. To assess macrophyte success, average population size was recorded through time. Turbidity level and average trait values were also recorded. I used these outputs to assess how background turbidity, trait variation and initial macrophytes and turbidity influenced results. 
+All analysis was conducted in RStudio. To assess macrophyte success, average population size was recorded through time. Turbidity level and average trait values were also recorded. I used these outputs to assess how background turbidity, trait variation and initial macrophytes and turbidity influenced results.
 
 ## Code
 
@@ -51,7 +44,6 @@ library(reshape2)
 #install.packages("patchwork")
 library(patchwork)
 ```
-
 
 ```{r, eval = FALSE}
 ############## Simulation function ######################
@@ -178,7 +170,6 @@ runMacrophyte <- function(n_sims, tmax = 100, rm = 0.1, rt = 0.1,
 }
 
 ```
-
 
 ```{r initial_turb, fig.height = 4, fig.width = 8, fig.path="./figs/", eval = FALSE}
 #### Parameter screen - results with varying initial turbidity ######
@@ -441,24 +432,22 @@ ggplot()+geom_jitter(data = final_mac, aes(x = T0, y = final_M),
 
 ## Results
 
-![The effect of background turbidity levels on final macrophyte population size. Equilibria from the analytic model are pictured for each parameter value (black points). Simulation results are represented by transparent points for low trait variance (red, simulated with beta(100,100)) and high variance (blue, simulated with beta(2,2)). Averages for each group at each value are connected by solid lines (n=30). ](figs/background_turb-1.pdf)
+![The effect of background turbidity levels on final macrophyte population size. Equilibria from the analytic model are pictured for each parameter value (black points). Simulation results are represented by transparent points for low trait variance (red, simulated with beta(100,100)) and high variance (blue, simulated with beta(2,2)). Averages for each group at each value are connected by solid lines (n=30).](figs/background_turb-1.pdf)
 
-Background turbidity level negatively impacted final macrophyte population size (figure 1). However, this decrease is not as pronounced as the analytic model suggested; population collapses were not observed in the extended model results. Furthermore, populations with higher initial trait variation were less affected by background turbidity (figure 1). 
-
+Background turbidity level negatively impacted final macrophyte population size (figure 1). However, this decrease is not as pronounced as the analytic model suggested; population collapses were not observed in the extended model results. Furthermore, populations with higher initial trait variation were less affected by background turbidity (figure 1).
 
 ![Macrophyte population size, turbidity level and trait value over time for various initial turbidity levels, indicated by colour. Solid lines indicated an average value (n = 30) at each time.](figs/initial_turb-1.pdf)
 
-Initial turbidity had no evident effect on macrophyte population dynamics (figure 2). However, differences of in the final turbidity and population size vary based on their initial trait averages. 
+Initial turbidity had no evident effect on macrophyte population dynamics (figure 2). However, differences of in the final turbidity and population size vary based on their initial trait averages.
 
-![Plot of Macrophyte population size, turbidity level and trait value over time for differing initial population size. Solid lines indicated an average value (n = 30) at each time. ](figs/initial_mac-1.pdf)
+![Plot of Macrophyte population size, turbidity level and trait value over time for differing initial population size. Solid lines indicated an average value (n = 30) at each time.](figs/initial_mac-1.pdf)
 
-Initial population size did influence the ecosystem state; smaller initial populations reached lower final population sizes (figure 3). Turbidity also remained higher in smaller populations.  
+Initial population size did influence the ecosystem state; smaller initial populations reached lower final population sizes (figure 3). Turbidity also remained higher in smaller populations.
+
 
 ## Conclusion
 
-Macrophyte population dynamics change when stochastic and individual variation was considered. Larger trait variation in the initial macrophyte population increased their resilience to environmental conditions. Consequently, trait variation is extremely important for maintaining shallow lake ecosystems. 
-
-Initial values had mixed effects; initial turbidity did not influence macrophyte population trajectories, however smaller initial populations performed worse on average. This information is important for restoration efforts - reintroduction of macrophytes should be possible at various turbidity levels. Smaller initial population sizes performed worse on average, suggesting that ...
+Macrophyte population dynamics were different when stochastic and individual variation was considered. Larger trait variation in the initial macrophyte population increased their resilience to environmental conditions. Consequently, trait variation is extremely important for maintaining shallow lake ecosystems. Initial values had mixed effects; initial turbidity did not influence macrophyte population trajectories, however smaller initial populations performed worse on average. This information is important for restoration efforts - reintroduction of macrophytes should be possible at various turbidity levels. 
 
 ## Bibliography
 
