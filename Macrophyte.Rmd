@@ -1,6 +1,6 @@
 ---
-title: "QBIO7004"
-author: "jasmine fowler-morrow"
+title: "Population Dynamics of Macrophytes in a Shallow Water Lake"
+author: "Jasmine Fowler-Morrow"
 date: '2022-05-25'
 output: pdf_document
 ---
@@ -11,44 +11,49 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction
 
-The abundance of aquatic vegetation (macrophytes) in shallow lakes play a key role in reducing turbidity and providing a food source for inhabitants. However, disturbing or removing macrophytes can cause rapid and irreversible changes to conditions (scheffer, 1998). Such observations have led researchers to conclude that shallow lakes commonly have two stable states; clear and turbid (scheffer, 1993).The state of the ecosystem will change after a "tipping point" is reached.
+The abundance of aquatic vegetation (macrophytes) in shallow lakes play a key role in reducing turbidity and providing a food source for inhabitants. However, disturbing or removing macrophytes can cause rapid and irreversible changes to conditions (Scheffer, 2004). Such observations have led researchers to conclude that shallow lakes commonly have two stable states; clear and turbid (scheffer, 2004).The state of the ecosystem will change after a critical value, or tipping point, is reached.
 
-Water mixing and light levels mean shallow lakes are rich in species. However, like many other aquatic ecosystems, the size and quality of such habitats has declined (scheffer, 1998).
+Previous research found macrophyte population size to primarily determine whether or not a state shift occurred  (Scheffer, 1993). Dakos et al (2019) further argued that trait variation and evolution are important for understanding tipping point dynamics. Dakos et al (2019) found that phenotypic variation can make macrophytes more resilient to collapse. However, this model was studied analytically, with a fixed trait score for the entire population which remained constant through time. This is a limited approach, since individuals who are fitter should be more likely to survive and reproduce. 
 
-The occurrence of tipping points in this ecosystem has been studied extensively (references).Previous research has found that whether or not this shift in states occurs depends on the macrophyte population size (ref). Dakos et al (2019) further argued that trait variation and evolution are important for understanding tipping point dynamics. Dakos et al (2019) found that phenotypic variation can make macrophytes more resilient to collapse. However, this model was studied analytically with trait values remaining constant through time. For this reason, I wished to add stochasticity and individual variation of trait value.
+
 
 ## Methods
 
-I created an individual-based stochastic model tracking macrophyte population dynamics over time in response to turbidity. The model tracks a population of macrophyte individuals which each have a given trait value (z). The simulation begins with an initial population ($n_0$) of macrophyte individuals, each with a trait value (z). The trait value is generated with a beta distribution.
-
-$$ P(reproducing)=r_MM\left(1-\frac{M}{K}\left(\frac{h_T^4+T^4}{h_t^4}\right)\right) $$ $$T_{t+1}=T_t+r_TT_t\left(1-\frac{T_t}{T_0\frac{h_M}{h_M+\frac{M}{K}}}\right) $$ Each time period, an individual has a fixed probability of dying. Given an individual does not die, they have a probability of reproducing (eq 1). Higher turbidity decreases their chance of reproducing as does lower trait values, which influences their response to turbidity (eq 2).
-
-It is assumed that all reproduction is asexual, and offspring receive the same trait value as their parent with some random genetic mutation.
+I created an individual-based stochastic model describing macrophyte population dynamics in response to turbidity. The model is adapted from an ordinary differential equation system described by Dakos et al (2019). The model tracks a population of macrophyte individuals and their trait value (z) through time. The simulation began with an initial population ($n_0$) of macrophyte individuals, each with a trait value (z). Initial trait values were generated with a beta distribution (shape = $z_1$, scale =$z_2$). Each time period, an individual has a fixed probability of dying ($\mu$). Given an individual does not die, they have a probability of reproducing:
+$$ P(reproducing)=r_MM\left(1-\frac{M}{K}\left(\frac{h_T^4+T^4}{h_t^4}\right)\right) $$
+This probability was used to closely match the analytic model, since highest reproduction probability would occur when growth rate was highest. Reproduction depended on a number of fixed parameters (Table 1), the number of macrophyte individuals in the previous time period (M), sensitivity to turbidity ($h_T$) and turbidity in the current time period (T). Turbidity was updated each time using a difference equation:
+$$T_{t+1}=T_t+r_TT_t\left(1-\frac{T_t}{T_0\frac{h_M}{h_M+\frac{M}{K}}}\right)$$   
+Sensitivity to turbidity was determined by individual trait value ($h_T$) in a relationship described by Dakos et al (2019):
+$$h_T=e^{cz} $$
+With parameters also fixed (table 1). Consequently, higher turbidity and lower trait values decreased an individuals chance of reproducing. It was assumed that all reproduction was asexual, and offspring received the same trait value as their parent with some random genetic mutation ($\sigma$).
 
 | Parameter                                 | Value/Range         |
 |-------------------------------------------|---------------------|
-| Carrying capacity (K)                     | 50                  |
-| Growth rates ($r_M, r_T$)                 | 0.1                 |
-| Turbidity half-saturation parameter $h_M$ | 0.2                 |
-| Trait value (z)                           | $[-2,2]$            |
-| Death rate ($\mu$)                        | 0.05                |
+| Carrying capacity (K)                     | $50$                |
+| Growth rates ($r_M, r_T$)                 | $0.1^*$             |
+| Turbidity half-saturation parameter $h_M$ | $0.2^*$             |
+| Trait value (z)                           | $[-2,2]^*$          |
+| Death rate ($\mu$)                        | $0.05$              |
 | Initial turbidity (initurb)               | ${0.1,0.3, 0.6, 1}$ |
 | Background turbidity ($T_0$)              | $[2,8]^*$           |
-| Genetic mutation rate ($\sigma$)          | 0.01                |
-|                                           |                     |
+| Genetic mutation rate ($\sigma$)          | $0.01$              |
+| turbidity response ($c$)                  | $0.5$               |
 
-: Table 1. Parameter values/ranges used in the model.\*values selected by Dakos et al (2019)
+: Parameter values/ranges used in the model.\*values selected by Dakos et al (2019)
 
-```{r, message = FALSE}
+All analysis was conducted in RStudio. To assess macrophyte success, average population size was recorded through time. Turbidity level and average trait values were also recorded. I used these outputs to assess how background turbidity, trait variation and initial macrophytes and turbidity influenced results. 
+
+## Code
+
+```{r, message = FALSE, eval = FALSE}
 library(tidyverse)
 library(reshape2)
 #install.packages("patchwork")
 library(patchwork)
 ```
 
-## Code
 
-```{r}
+```{r, eval = FALSE}
 ############## Simulation function ######################
 #function to simulate macrophyte individuals and their trait values over time in response to turbidity 
 #Inputs:
@@ -131,14 +136,14 @@ macrophyte_growth <- function(inipop, initurb, tmax, p){
 
 ```
 
-```{r}
+```{r, eval = FALSE}
 ######## Running function ###########
 #this function runs the macrophyte population model numerous times 
 #it allows parameters and initial values to be specified 
 # it requires number of simulations (n_sims)
 #returns 4 matrices corresponding to macrophyte population, turbidity level, mean trait value and trait standard deviation
 runMacrophyte <- function(n_sims, tmax = 100, rm = 0.1, rt = 0.1,
-                          hm = 0.2, T0 = 3, zmin = 2, zmax = 2,
+                          hm = 0.2, T0 = 3, z1 = 2, z2 = 2,
                           K = 50, mu = 0.05, sigma = 0.001, n0 = 10,initurb = 0.5){
   #create parameter list 
   p <- list() #parameter list 
@@ -152,7 +157,7 @@ runMacrophyte <- function(n_sims, tmax = 100, rm = 0.1, rt = 0.1,
   
   #create data frame for initial population 
   inipop <- data.frame(ID = 1:n0, 
-                       z = 2*(-0.5+rbeta(n0, zmin, zmax)), #generate trait values
+                       z = 2*(-0.5+rbeta(n0, z1, z2)), #generate trait values
                        alive = TRUE)
   
   ##matrices to store simulation results 
@@ -174,80 +179,8 @@ runMacrophyte <- function(n_sims, tmax = 100, rm = 0.1, rt = 0.1,
 
 ```
 
-```{r}
 
-#this function summarises the simulation results
-#summary = "plot" returns a plot of the data over time 
-Macrophyte_sim_summary <- function(result, summary = "plot"){
-  ### MACROPHYTES ###
-  df <- melt(result$mac_pop, varnames = c("Sim","Time"), value.name = "M")
-  dfmean <- df %>%
-    group_by(Time) %>%
-    summarise(mean_M = mean(M), se = sd(M)/length(M))
-
-  ### TURBIDITY ###
-  df2 <- melt(result$turb, varnames = c("Sim","Time"), value.name = "Tb")
-  df2mean <- df2 %>%
-    group_by(Time) %>%
-    summarise(mean_T = mean(Tb))
-
-  ### TRAIT MEAN ###
-  df3 <- melt(result$Z_means, varnames = c("Sim","Time"), value.name = "zbar")
-  df3mean <- df3 %>%
-    group_by(Time) %>%
-    summarise(mean_z = mean(zbar))
-
-  ### TRAIT SD ###
-  df4 <- melt(result$Z_sd, varnames = c("Sim","Time"), value.name = "zsd")
-  df4mean <- df4 %>%
-    group_by(Time) %>%
-    summarise(mean_zsd = mean(zsd))
-
-  if (summary == "plot"){
-      p1 <- ggplot() + 
-        geom_line(data = df, aes(x = Time, y = M, group = Sim, 
-                             colour = as.character(Sim)), 
-              show.legend = FALSE, alpha = 0.3)+ 
-        geom_line(data = dfmean, aes(x = Time, y = mean_M), size = 0.8) +
-        theme_minimal() + labs(x = "Time step", y = "Macrophyte individuals")
-      p2 <- ggplot() + 
-          geom_line(data = df2, aes(x = Time, y = Tb, 
-                                    group = Sim, colour = as.character(Sim)), 
-                    show.legend = FALSE, alpha = 0.2)+ 
-          geom_line(data = df2mean, aes(x = Time, y = mean_T), size = 0.8) +
-          theme_minimal()+ labs(x = "Time step", y = "Turbidity level")
-      p3 <- ggplot() + 
-        geom_line(data = df3, aes(x = Time, y = zbar, group = Sim, 
-                              colour = as.character(Sim)), 
-              show.legend = FALSE, alpha = 0.2)+ 
-        geom_line(data = df3mean, aes(x = Time, y = mean_z), size = 0.8) +
-        theme_minimal()+ labs(x = "Time step", y = "Mean trait value (z)")
-      p4 <- ggplot() + 
-        geom_line(data = df4, aes(x = Time, y = zsd, group = Sim, 
-                              colour = as.character(Sim)), 
-              show.legend = FALSE, alpha = 0.2)+ 
-        geom_line(data = df4mean, aes(x = Time, y = mean_zsd), size = 0.8) +
-        theme_minimal()+ labs(x = "Time step", y = "Trait (z) standard deviation")
-      ### use patchwork to return ###
-      p <- (p1 | p2)/ (p3 | p4)
-    return(p)
-  }
-  else if (summary == "stats"){
-    M_end <- dfmean[dfmean$Time==100,2]
-    Turb_end <- df2mean[df2mean$Time==100,2]
-    return(data.frame(M_end = M_end, Turb_end = Turb_end))
-  }
-  else if(summary == "data"){
-    return(list(M = df, Tb = df2, z = df3))
-  }
-
-}
-
-
-
-```
-
-```{r initial_turb, fig.height = 4, fig.width = 8, fig.path="./figs/"}
+```{r initial_turb, fig.height = 4, fig.width = 8, fig.path="./figs/", eval = FALSE}
 #### Parameter screen - results with varying initial turbidity ######
 #this function summarises the simulation results from different initial turbidity values 
 #returns: a plot of macrophyte numbers, turbidity and trait mean through time for each initial turbidity value
@@ -324,7 +257,7 @@ vary_initial_turbidity()
 
 ```
 
-```{r initial_mac, fig.height = 4, fig.width = 8, fig.path="./figs/"}
+```{r initial_mac, fig.height = 4, fig.width = 8, fig.path="./figs/", eval = FALSE}
 #### Parameter screen - results with varying initial macrophyte numbers ######
 #this function summarises the simulation results from different initial macrophyte population sizes  
 #returns: a plot of macrophyte numbers, turbidity and trait mean through time for each initial population size
@@ -402,7 +335,49 @@ vary_initial_mac()
 
 ```
 
-```{r background_turb, fig.path = "./figs/"}
+```{r, eval = FALSE}
+#this function summarises the simulation results
+#summary - "data" returns a list of data frames of population size, turbditiy and trait mean
+#summary = "stats" returns mean final population size and turbidity and SE
+Macrophyte_sim_summary <- function(result, summary = "stats"){
+  ### MACROPHYTES ###
+  df <- melt(result$mac_pop, varnames = c("Sim","Time"), value.name = "M")
+  dfmean <- df %>%
+    group_by(Time) %>%
+    summarise(mean_M = mean(M), se = sd(M)/length(M))
+
+  ### TURBIDITY ###
+  df2 <- melt(result$turb, varnames = c("Sim","Time"), value.name = "Tb")
+  df2mean <- df2 %>%
+    group_by(Time) %>%
+    summarise(mean_T = mean(Tb))
+
+  ### TRAIT MEAN ###
+  df3 <- melt(result$Z_means, varnames = c("Sim","Time"), value.name = "zbar")
+  df3mean <- df3 %>%
+    group_by(Time) %>%
+    summarise(mean_z = mean(zbar))
+
+  ### TRAIT SD ###
+  df4 <- melt(result$Z_sd, varnames = c("Sim","Time"), value.name = "zsd")
+  df4mean <- df4 %>%
+    group_by(Time) %>%
+    summarise(mean_zsd = mean(zsd))
+
+   if (summary == "stats"){
+    M_end <- dfmean[dfmean$Time==100,2]
+    Turb_end <- df2mean[df2mean$Time==100,2]
+    return(data.frame(M_end = M_end, Turb_end = Turb_end))
+  }
+  else if(summary == "data"){
+    return(list(M = df, Tb = df2, z = df3))
+  }
+
+}
+
+```
+
+```{r background_turb, fig.path = "./figs/", eval = FALSE}
 ####### simulate final population size over range of background turbidity ######
 ####### WITH trait variation #######
 M <- rep(0,7)
@@ -428,7 +403,7 @@ final_mac2 <- data.frame(T0 = NULL, final_M = NULL)
 for (t in 2:8){
   #run simulation for given T0 value
   result <- runMacrophyte(50, initurb = 0.5, T0 = t, n0 = 10, 
-                          zmin = 100, zmax = 100)
+                          z1 = 100, z2 = 100)
   
   #average final macrophyte population size 
   M2[t-1] <- Macrophyte_sim_summary(result, "stats")[[1]]
@@ -466,19 +441,24 @@ ggplot()+geom_jitter(data = final_mac, aes(x = T0, y = final_M),
 
 ## Results
 
-![The effect of background turbidity levels on final macrophyte population size.](figs/background_turb-1.pdf)
+![The effect of background turbidity levels on final macrophyte population size. Equilibria from the analytic model are pictured for each parameter value (black points). Simulation results are represented by transparent points for low trait variance (red, simulated with beta(100,100)) and high variance (blue, simulated with beta(2,2)). Averages for each group at each value are connected by solid lines (n=30). ](figs/background_turb-1.pdf)
 
-Background turbidity level negatively impacted average macrophyte population size in the final time period. However, this decrease is not as pronounced as the analytic model suggests. Furthermore, populations with higher trait variation were less affected by background turbidity and had higher average final populations.
+Background turbidity level negatively impacted final macrophyte population size (figure 1). However, this decrease is not as pronounced as the analytic model suggested; population collapses were not observed in the extended model results. Furthermore, populations with higher initial trait variation were less affected by background turbidity (figure 1). 
 
-![Macrophyte population size, turbidity level and trait value over time for various initial turbidity levels. Solid lines indicated an average value (n = 30).](figs/initial_turb-1.pdf)
 
-Initial turbidity had no evident effect on macrophyte population dynamics. The slight differences in groups can
+![Macrophyte population size, turbidity level and trait value over time for various initial turbidity levels, indicated by colour. Solid lines indicated an average value (n = 30) at each time.](figs/initial_turb-1.pdf)
 
-![Plot of Macrophyte population size, turbidity level and trait value over time for differing initial population size. ](figs/initial_mac-1.pdf)
+Initial turbidity had no evident effect on macrophyte population dynamics (figure 2). However, differences of in the final turbidity and population size vary based on their initial trait averages. 
+
+![Plot of Macrophyte population size, turbidity level and trait value over time for differing initial population size. Solid lines indicated an average value (n = 30) at each time. ](figs/initial_mac-1.pdf)
+
+Initial population size did influence the ecosystem state; smaller initial populations reached lower final population sizes (figure 3). Turbidity also remained higher in smaller populations.  
 
 ## Conclusion
 
-Trait variation and evolution increase the resilience of macrophyte population. Consequently, trait variation is extremely important for maintaining shallow lake ecosystems. Furthermore, initial turbidity has no effect on macrophyte population trajectories. This information is important for restoration efforts - reintroduction of macrophytes should be possible at various turbidity levels.
+Macrophyte population dynamics change when stochastic and individual variation was considered. Larger trait variation in the initial macrophyte population increased their resilience to environmental conditions. Consequently, trait variation is extremely important for maintaining shallow lake ecosystems. 
+
+Initial values had mixed effects; initial turbidity did not influence macrophyte population trajectories, however smaller initial populations performed worse on average. This information is important for restoration efforts - reintroduction of macrophytes should be possible at various turbidity levels. Smaller initial population sizes performed worse on average, suggesting that ...
 
 ## Bibliography
 
